@@ -45,16 +45,26 @@ export class HeroService {
       catchError(this.handleError<Hero>(`get Hero id=${id}`))
     );
   }
-  ngOnInit(): void {
-    //Called after the constructor, initializing input properties, and the first call to ngOnChanges.
-    //Add 'implements OnInit' to the class.
-  
+  addHero(hero: Hero): Observable<Hero> {
+    return this.http.post<Hero>(this.heroUrl, hero, httpOptions)
+    .pipe(tap((hero:Hero) => this.log(`added Hero w/
+    id${hero.id}`)),
+    catchError(this.handleError<Hero>('addHero')))
   }
   updateHero(hero: Hero): Observable<any> {
     return this.http.put(this.heroUrl, hero, httpOptions).pipe(
       tap(_=> this.log(`updated hero id=${hero.id}`)),
       catchError(this.handleError<any>('upadteHero'))
     )
+  }
+  deleteHero(hero: Hero |number): Observable<Hero>{
+    const id =typeof hero ==='number' ? hero : hero.id;
+    const url=`${this.heroUrl}/${id}`;
+    return this.http.delete<Hero>(url, httpOptions).pipe(
+      tap(_=>this.log(`deleted hero id=${id}`)),
+      catchError(this.handleError<Hero>('deletedHero'))
+    );
+
   }
 
 }
